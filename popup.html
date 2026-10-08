@@ -18,6 +18,19 @@
       justify-content: space-between;
       align-items: center;
     }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hide-timer-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+    }
     .refresh-btn {
       background: none;
       border: none;
@@ -89,11 +102,28 @@
       color: #86868B;
       font-size: 13px;
     }
+
+    .hide-timer-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h3>
     <span>Today's Schedule</span>
+
+    <span class="header-actions">
+      <label class="hide-timer-label">
+        <input type="checkbox" id="hide-timer">
+          Hide Timer
+      </label>
+    </span>
+
     <button id="refresh" class="refresh-btn" title="Sync Schedule">🔄</button>
   </h3>
   <div class="schedule-container" id="schedule-list">

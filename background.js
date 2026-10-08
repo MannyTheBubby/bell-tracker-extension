@@ -77,7 +77,17 @@ async function syncSmartPassSchedule() {
 
 // Calculates time blocks dynamically and projects numbers onto the extension icon
 async function updateVisualBadgeCountdown() {
-  const data = await chrome.storage.local.get(['currentDaySchedule', 'lastFetchedDate']);
+  const data = await chrome.storage.local.get([
+    'currentDaySchedule',
+    'lastFetchedDate',
+    "hideTimer"
+  ]);
+
+  if (data.hideTimer === true) {
+    chrome.action.setBadgeText({ text: ""})
+    return;
+  }
+
   const todayStr = getLocalDateString();
 
   if (data.lastFetchedDate !== todayStr) {
@@ -142,5 +152,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "forceRefresh") {
     syncSmartPassSchedule().then(() => sendResponse({ success: true }));
     return true; 
+  }
+
+  if (request.action === "updateTimerVisibility"){
+    updateVisualBadgeCountdown();
+    sendResponse({ success: true });
+    return true;
   }
 });

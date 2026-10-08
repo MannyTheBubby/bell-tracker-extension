@@ -50,6 +50,25 @@ function renderPopupSchedule() {
   });
 }
 
+const timerCheckbox = document.getElementById("hide-timer");
+
+chrome.storage.local.get(["hideTimer"], data => {
+
+  timerCheckbox.checked = data.hideTimer ?? false;  
+})
+
+timerCheckbox.addEventListener("change", () => {
+  const hideTimer = timerCheckbox.checked;
+
+  chrome.storage.local.set({
+    hideTimer: hideTimer
+  })
+
+  chrome.runtime.sendMessage({
+    action: "updateTimerVisibility"
+  })
+})
+
 document.getElementById('refresh').addEventListener('click', () => {
   const btn = document.getElementById('refresh');
   btn.style.opacity = '0.5';
