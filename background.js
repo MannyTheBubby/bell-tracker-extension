@@ -1,4 +1,4 @@
-// background.js - Core logic for Schedule Sync and Badge Countdown
+// background.js - Core logic for SmartPass Schedule Sync and Badge Countdown
 const SCHOOL_ID = 2844; // Static school ID for the target institution, can be made dynamic if needed
 
 // Helper to generate dynamic local date strings safely
@@ -12,20 +12,40 @@ function getLocalDateString(offsetDays = 0) {
 }
 
 // Main background pipeline to pull identity and target day agendas
-async function syncMasonSchedule() {
+async function syncSmartPassSchedule() {
   const todayStr = getLocalDateString();
   const tomorrowStr = getLocalDateString(1);
 
   try {
+    // Step 1: Bootstrap Identity via active cookies
+    const initResponse = await fetch('https://smartpass.app/api/prod-us-central/v2/users/Init', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        start_date: todayStr,
+        end_date: tomorrowStr,
+        preferred_school_id: SCHOOL_ID
+      })
+    });
+
+    if (!initResponse.ok) throw new Error("User session not found or cookie expired.");
+    const initData = await initResponse.json();
+    const userId = initData?.user?.id;
     
-    // Extract real-time agenda for current calendar slot
-    // Placeholder mock data
-    const agendaResponse = await fetch('https://ricec-at-masonhs.github.io/bell-schedule-mock/schedule.json', {
-      method: 'GET',
+    if (!userId) throw new Error("Could not parse explicit user ID context.");
+
+    // Step 2: Extract real-time agenda for current calendar slot
+    const agendaResponse = await fetch('https://smartpass.app/api/prod-us-central/v2/schedules/GetAgendaForDates', {
+      method: 'POST',
       headers: {
         'content-type': 'application/json',
         'x-school-id': String(SCHOOL_ID)
-      }
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        start_date: todayStr,
+        end_date: tomorrowStr
+      })
     });
 
     if (!agendaResponse.ok) throw new Error("Failed to map schedule coordinates.");
@@ -71,7 +91,7 @@ async function updateVisualBadgeCountdown() {
   const todayStr = getLocalDateString();
 
   if (data.lastFetchedDate !== todayStr) {
-    syncMasonSchedule();
+    syncSmartPassSchedule();
     return;
   }
 
@@ -112,25 +132,25 @@ async function updateVisualBadgeCountdown() {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.alarms.create("clockTicker", { periodInMinutes: 1 });
   chrome.alarms.create("networkSync", { periodInMinutes: 60 });
-  syncMasonSchedule();
+  syncSmartPassSchedule();
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  syncMasonSchedule();
+  syncSmartPassSchedule();
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "clockTicker") {
     updateVisualBadgeCountdown();
   } else if (alarm.name === "networkSync") {
-    syncMasonSchedule();
+    syncSmartPassSchedule();
   }
 });
 
 // Listener to handle forced manual refreshes triggered by the popup interface
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "forceRefresh") {
-    syncMasonSchedule().then(() => sendResponse({ success: true }));
+    syncSmartPassSchedule().then(() => sendResponse({ success: true }));
     return true; 
   }
 

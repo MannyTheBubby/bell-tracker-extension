@@ -14,7 +14,53 @@ This document establishes the architecture constraints, payload shapes, executio
 
 ## 🌐 Structural Core Schemas
 
-This uses the public API at https://ricec-at-masonhs.github.io/bell-schedule-mock/schedule.json (and that link will change).
+When reading or formatting data, verify your variables against these exact verified endpoint wireframe formats captured from production telemetry. These endpoints include hardcoded 'regions' that could become stale, or noty apply to schools in another area. 
+
+### 1. Session Bootstrap Engine (`users/Init`)
+
+* **Endpoint:** `POST https://smartpass.app/api/prod-us-central/v2/users/Init`
+* **Purpose:** Discovers user metadata and identifies the active target `user.id`.
+* **Primary Request Payload Shape:**
+```json
+{
+  "start_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD",
+  "preferred_school_id": 2844
+}
+
+```
+
+
+* **Critical Target Extraction Coordinates:** `response.user.id` and `response.user.display_name`.
+
+### 2. Schedule Calendar Retrieval (`schedules/GetAgendaForDates`)
+
+* **Endpoint:** `POST https://smartpass.app/api/prod-us-central/v2/schedules/GetAgendaForDates`
+* **Purpose:** Extracts the precise dynamic grid coordinates mapping classes to timestamps for a specific slot.
+* **Primary Request Payload Shape:**
+```json
+{
+  "user_id": 4942806,
+  "start_date": "YYYY-MM-DD",
+  "end_date": "YYYY-MM-DD"
+}
+
+```
+
+
+* **Critical Target Extraction Coordinates:** Iterates over the `response.days["YYYY-MM-DD"].period_agendas` array.
+* **Atomic Period Object Template:**
+```json
+{
+  "start_time": "07:45",
+  "end_time": "08:31",
+  "long_name": "Period 1",
+  "schedule_group_id": 10904,
+  "room_id": 384924
+}
+
+```
+
 
 
 ---
@@ -73,6 +119,6 @@ When taking on issues, work down these specific evolutionary objectives:
     - `S` < special bell (catchall for exception cases)
 2. **[Countdown Timer should be an option](https://github.com/RiceC-at-MasonHS/bell-tracker-extension/issues/2):** Some users will want the number to be on display all the time. 
 Others will want to have the extension Icon to clearly show the current bell.  We should make it so the users have a checkbox option on the 'popup' to choose if they want the countdown badge text to show or not. 
-3. **Dynamic School Resolution:** MMS/MHS school ID
+3. **Dynamic School Resolution:** Abstract out the hardcoded `SCHOOL_ID = 2844` constant by reading the school ID directly out of the `users/Init` payload parameters dynamically on boot. This also would include making the regions dynamic, so endpoints that reach out to `.../api/prod-us-central/v2/...` can work for schools in any part of boader Smartpass service area.
 4. **Passing Period Visual Tracker:** Instead of showing a generic flat line (`-`) when an active class cannot be matched, update the processing math engine to track if the current timestamp fits between the `end_time` of period $N$ and the `start_time` of period $N+1$, altering badge aesthetics to indicate a passing countdown.
 5. **PowerSchool Data Integration Pipeline:** Bridge complementary rosters or classroom specific context parameters directly into rows by introducing selective API content scraping on PowerSchool dashboard URLs.

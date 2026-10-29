@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Bell Badge Tracker",
+  "name": "SmartPass Bell Badge Tracker",
   "version": "1.0",
   "description": "Displays remaining period minutes directly on the extension icon.",
   "permissions": [
@@ -8,7 +8,7 @@
     "alarms"
   ],
   "host_permissions": [
-    "https://ricec-at-masonhs.github.io/bell-schedule-mock/schedule.json"
+    "https://smartpass.app/*"
   ],
   "background": {
     "service_worker": "background.js"

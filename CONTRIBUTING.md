@@ -1,4 +1,4 @@
-# 🤝 Contributing to Bell Tracker
+# 🤝 Contributing to SmartPass Bell Tracker
 
 Thank you for your interest in improving this project! Before you get started, please read this guide. It outlines the unique mission of this repository and explains how we work together.
 
