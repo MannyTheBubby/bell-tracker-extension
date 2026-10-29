@@ -5,7 +5,7 @@ A lightweight, privacy-first Chrome Extension designed for teachers and administ
 > [!TIP]
 > This project may soon be migrating to a public PowerSchool API endpoint as the source of truth for the daily clock-schedule.
 
-By pulling real-time schedules directly from your existing SmartPass session, this extension entirely eliminates the guesswork of 4-day rotating block schedules, unexpected pep rallies, mid-day adjustments, or emergency delay schedules.
+By pulling real-time schedules from a dedicated public API, this extension entirely eliminates the guesswork of 4-day rotating block schedules, unexpected pep rallies, mid-day adjustments, emergency delay schedules, etc...
 
 ![Screenshot of an alpha version of the extension working.](demo-img.png)
 
@@ -14,7 +14,7 @@ By pulling real-time schedules directly from your existing SmartPass session, th
 ## ✨ Features
 
 - **Zero-Click Live Countdown:** Look right at your extension toolbar to see exactly how many minutes are remaining in the current period (e.g., `14m` displayed directly on the icon).
-- **Dynamic Schedule Awareness:** No hardcoded schedules. The tool updates hourly from SmartPass to stay perfectly aligned with snow delays, custom rosters, assembly days, and rolling block switches.
+- **Dynamic Schedule Awareness:** No hardcoded schedules. The tool updates hourly from schedules to stay perfectly aligned with snow delays, custom rosters, assembly days, and rolling block switches.
 - **Visual Schedule Dropdown:** Click the extension icon to reveal a clean, scannable timeline of the entire school day, highlighting your active location in real-time.
 - **Privacy-by-Design Architecture:** Zero servers. Zero analytics tracking. Zero third-party telemetry. All parsing, validation, and session mapping occur strictly within your browser's local sandbox storage (`chrome.storage.local`).
 
@@ -26,8 +26,8 @@ The extension is engineered strictly under the modern Chrome Extension **Manifes
 
 
 ```
-smartpass-bell-tracker/
-├── manifest.json       # Structural permissions boundaries & host constraints
+bell-tracker/
+├── manifest.json      # Structural permissions boundaries & host constraints
 ├── background.js      # Global decoupled engine worker (identity resolver & time engine)
 ├── popup.html         # Scannable dropdown interface markup
 └── popup.js           # UI coordinator and temporal matching visualizer
@@ -45,7 +45,7 @@ Because this extension operates entirely locally to protect administrative and s
 3. **Enable Developer Mode:** Toggle the **Developer mode** switch in the upper-right corner of the window.
 4. **Load the Extension:** Click the **Load unpacked** button in the top-left corner.
 5. **Select Folder:** Select the root directory containing the project files.
-6. **Authentication Trigger:** Ensure you are logged into your school's SmartPass platform on Chrome. The extension automatically inherits the authenticated token session cookies to perform secure local API inquiries.
+6. **Authentication:** Avoid all authentication issues. All the data is from public APIs.
 
 ---
 
