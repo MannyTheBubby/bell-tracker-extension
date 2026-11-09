@@ -20,7 +20,10 @@ async function syncMasonSchedule() {
 
     const todayData = agendaData.buildings?.[0];
     if (todayData?.periods) {
-      const cleanPeriods = todayData.periods.map(p => ({
+      const cleanPeriods = todayData.periods
+      // Filter out Period 8 (period_id === "P8")
+      .filter(p => p.period_id !== "P8")
+      .map(p => ({
         name: p.name,
         start: p.start_time,
         end: p.end_time
