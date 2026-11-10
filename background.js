@@ -13,7 +13,8 @@ async function syncMasonSchedule() {
   const todayStr = getLocalDateString();
 
   try {
-    const agendaResponse = await fetch('https://ricec-at-masonhs.github.io/bell-schedule-mock/schedule.json');
+    // Use official Mason API
+    const agendaResponse = await fetch('https://storage.googleapis.com/mcs-bell-api/schedule.json');
 
     if (!agendaResponse.ok) throw new Error("Failed to map schedule coordinates.");
     const agendaData = await agendaResponse.json();
